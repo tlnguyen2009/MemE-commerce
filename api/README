@@ -1,0 +1,24 @@
+The flow for designing Stripe by PaymentIntent and Elements:
+
+        User fills out card info in your custom form
+                |
+                ▼
+        Frontend sends form data to Stripe Elements
+                |
+                ▼
+        Frontend calls your backend to create a PaymentIntent
+                |
+                ▼
+        Stripe returns client_secret → sent back to frontend
+                |
+                ▼
+        Frontend calls stripe.confirmCardPayment(client_secret)
+                |
+                ▼
+        Stripe processes payment + authentication (e.g., 3D Secure)
+                |
+                ▼
+        PaymentIntent status updates: succeeded / failed
+                |
+                ▼
+        You handle UI result (success screen, error, etc.)

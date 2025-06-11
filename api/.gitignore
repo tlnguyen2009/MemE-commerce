@@ -1,0 +1,10 @@
+# module file
+node_modules
+
+# environment file
+.env
+
+#private and public keys files
+private.key 
+public.key
+
