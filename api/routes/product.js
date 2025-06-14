@@ -50,32 +50,26 @@ router.get("/find/:id", async(req, res) => {
 })
 
 //GET all products
-router.get("/find", async(req, res) => {
-    const recentProduct = req.query.recent; // e.g. "?recent = true"            | 1st way to retrieve query
+router.get("/", async(req, res) => {
+    const newProduct = req.query.new; // e.g. "?recent = true"            | 1st way to retrieve query
     const queryCategory = req.query.category; // e.g. ?catetogory = "crying"
-    const {limit} = req.query; //"?limit= 10                                    | 2nd way to retrieve query
-    
-    const finalLimit = limit ? parseInt(limit) : 5; // check if litmit exist, otherwise, set default to 5. use button to set limit later
 
     try{
         let allProducts;
 
-        if(recentProduct) { //show by recently
-            allProducts = Product.find().sort({createdAt: -1});
+        if(newProduct) { //show by recently
+            allProducts = await Product.find().sort({createdAt: -1}).limit(1);
         } else if (queryCategory) {
-            allProducts = Product.find({
+            allProducts = await Product.find({
                 categories: {
                     $in: [queryCategory]
                 },
             });
         } else {
-            allProducts = Product.find();
+            allProducts = await Product.find();
         }
-
-        allProducts = allProducts.limit(finalLimit);
-        
-        const allProductsReturn = await allProducts; //put await at the end here to end "chained" query above 
-        res.status(200).json(allProductsReturn);
+         
+        res.status(200).json(allProducts);
     } catch (err) {
         res.status(500).json(err)
     }

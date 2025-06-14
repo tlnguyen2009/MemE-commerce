@@ -49,10 +49,9 @@ const Option = styled.option`
 `
 
 const ProductList = () => {
+  //Extracting the path from "Categories.jsx" in "Home".
   const location = useLocation();
-  // console.log(location.pathname.split('/')[2])
-  const category = location.pathname.split('/')[2] //extract the path when user click on one of "Categories" from "Home"
-//   console.log(category)
+  const category = location.pathname.split('/')[2] 
 
   const[filterCat, setFilterCat] = useState(category) //set default as URL from location.pathname...will change later when user pick "selection" below
   const[sort, setSort] = useState('newest')
@@ -66,7 +65,7 @@ const ProductList = () => {
             <Filter>
                 <FilterText>Filter Products:</FilterText>
                 <Select onChange={(e) => setFilterCat(e.target.value)}> 
-                    <Option> All </Option>
+                    <Option> all </Option>
                     <Option>funny-meme</Option>
                     <Option>crying-meme</Option>
                     <Option>really-meme</Option>

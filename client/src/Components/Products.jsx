@@ -1,8 +1,14 @@
+/*
+trouble i have:
+1/ seems like the url only works with lowercase like "all", not "All". When I have the "cat" parameter with "All", it just return the an empty array for "filterArr". So when you type "http://localhost:3000/products/All", it will automatically convert to "http://localhost:3000/products/all"
+*/
+
 import { useEffect, useState } from 'react';
 import styled from 'styled-components'
 import { popularProducts } from '../data'
 import { mobile } from '../responsive';
 import Product from './Product'
+import axios from 'axios'
 
 const Container = styled.div`
     
@@ -18,40 +24,41 @@ const Container = styled.div`
     `}
 `;
 
-const Products = ({cat}) => {
+const Products = ({cat, sort}) => {
   const [filterProducts, setFilterProducts] = useState([]) //use to save new array created in useEffect() below based on "cat"
 
   useEffect(()=>{
-    let filterArr = [...popularProducts]; //shallow copy of popularProducts array
-    console.log(filterArr)
+    const getProducts = async () => {
+      try {
+        const res = await axios.get(
+          cat && cat !== 'all' //if "cat" has value AND "cat" not 'all'
+              ? `http://localhost:5000/api/products?category=${cat}` //api help us to find corresponding category -> read api/product.js
+              : `http://localhost:5000/api/products`
+        )
+        // console.log(res.data) // print out to see how data array look like
 
-    //if cat exist, sorted new array upon "cat", otherwise, it's still old array
-    if (cat !== 'All') { 
-      filterArr = filterArr.filter(
-          (item) => item.category === cat
-      )
+        let products = res.data //put data array from response (res) above into a variable to filter
+        
+        //Apply sort
+        if (sort === 'asc') {
+          products.sort((a,b) => a.price - b.price);
+        } else if (sort = 'desc') {
+          products.sort((a,b) => b.price - a.price);
+        } else {
+          products.sort((a,b) => a.createdAt - b.createdAt);
+        }
+        console.log(products)
+        setFilterProducts(products)
+      } catch (err) {};
+    }
+    getProducts();
+  }, [cat, sort]) //re-run logic again when "cat" or "sort" change
 
-      console.log(filterArr)
-  
-    } 
-
-    setFilterProducts(filterArr)
-
-    // //sort the list
-    // if (sort === 'asc') {
-    //   filterArr.sort((a, b) => a.price - b.price)
-    // } else if (sort === 'desc') {
-    //   filterArr.sort((a, b) => b.price - a.price);
-    // } else {
-      
-    // }
-
-  }, [cat]) //re-run logic again when "cat" or "sort" change
-
+  //Using filterProducts above to show (map) results
   return (
     <Container>
         {filterProducts.map((item) => (
-            <Product eachproduct = {item} key = {item.id}/> 
+            <Product eachproduct = {item} key = {item._id}/> 
         ))}
     </Container>
   )

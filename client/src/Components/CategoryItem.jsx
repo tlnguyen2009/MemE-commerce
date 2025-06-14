@@ -51,7 +51,7 @@ const CategoryItem = ({itemTag}) => {
       <Image src = {itemTag.img}/>
       <Info>
         <Title>{itemTag.title}</Title>
-        <Link to={`/products/${itemTag.category}`}>
+        <Link to={`/products/${itemTag.category}`}> {/* finding the path in App.jsx (should be productList.jsx)*/}
           <Button>SEE NOW</Button>
         </Link>
       </Info>
