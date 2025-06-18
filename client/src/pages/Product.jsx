@@ -1,3 +1,9 @@
+/*
+(1) we need "?" there because If product.price is undefined (which it often is before 
+    your API fetch finishes), it will crash. Now, with ?.toFixed(2) => safe, no crash, 
+    it waits until data is fetched.
+*/
+
 // Single product page
 
 import { Add, Remove } from "@mui/icons-material"
@@ -7,6 +13,9 @@ import Footer from "../Components/Footer"
 import Navbar from "../Components/Navbar"
 import Newsletter from "../Components/Newsletter"
 import { mobile } from "../responsive"
+import { useLocation } from "react-router-dom"
+import { useEffect, useState } from "react"
+import axios from 'axios'
 
 const Container = styled.div``
 
@@ -44,7 +53,7 @@ const Title = styled.h1`
     font-weight: 400; /*make it look thinner than h1*/
 `
 
-const Desc = styled.p`
+const Desc = styled.div`
     margin: 20px 0px;
 `
 
@@ -114,39 +123,62 @@ const Button = styled.button`
 `
 
 const Product = () => {
+  //Extracting the path from "Product.jsx" in Component folder.
+  const location = useLocation();
+  const id = location.pathname.split('/')[2]; 
+  const [product, setProduct] = useState({});
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    const getProduct = async () => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/products/find/${id}`);
+            setProduct(res.data);
+            console.log("Fetched product:", res.data);
+        } catch (err) {
+            console.error("Error fetching product:", err);
+        }
+    };
+    // console.log(id);
+    getProduct();
+    console.log(product);
+  }, [id])
+
+  //Update quantity
+  const handleQuantity = (signal) => {
+    if (signal === 'decrease' && quantity > 1) {
+        setQuantity(quantity - 1)
+    } else if (signal === 'increase') {
+        setQuantity(quantity + 1)
+    }
+  }
+
+  //Update cart
+  const handleAddCart = () => {
+
+  }
+
   return (
     <Container>
         <Navbar/>
         <Announcement/>
         <Wrapper>
             <ImageContainer>
-                <Image src = "/Assets/product_crying5.jpg"/>
+                <Image src = {product.img}/>
             </ImageContainer>
             
             <InfoContainer>
-                <Title>When Life Meows, but It Hurts</Title>
-                <Desc>
-                    This is no ordinary feline. Behold the Crying Cat, a creature whose soul has witnessed the darkest depths of human emotion — or 
-                    at least the moment you realize your code has been broken for three hours because of a single misplaced bracket. With glassy, 
-                    tear-filled eyes and a trembling mouth that speaks silent volumes, this cat captures the fragile emotional state of everyone 
-                    who's ever pretended to be okay but was actually on the brink of a full-on existential breakdown.
-                    It’s the face you make when:
-                            <ul>
-                                <li>You say “I’m fine” but you’re not fine.</li>
-                                <li>You drop your taco right after saying how happy you are.</li>
-                                <li>You accidentally hit "Reply All."</li>
-                                <li>Or when you realize the “save” button you didn’t press 4 hours ago was your last lifeline.</li>
-                            </ul>
-                </Desc>
+                <Title>{product.title}</Title>
+                <Desc>{product.desc}</Desc>
                 
                 <AddContainer>
-                    <Price>$ 1.00 ea.</Price>
+                    <Price>${product.price?.toFixed(2)}</Price> {/* why we need "?". Read (1)  */}
                     <AmountContainer>
-                        <AdjustButton><Remove/></AdjustButton>
-                        <Amount>1</Amount>
-                        <AdjustButton><Add/></AdjustButton>
+                        <AdjustButton onClick = {() => handleQuantity("decrease")}><Remove/></AdjustButton>
+                        <Amount>{quantity}</Amount>
+                        <AdjustButton onClick = {() => handleQuantity("increase")}><Add/></AdjustButton>
                     </AmountContainer>
-                    <Button>ADD TO CART</Button>
+                    <Button onClick = {handleAddCart}>ADD TO CART</Button>
                 </AddContainer>
             </InfoContainer>
         </Wrapper>

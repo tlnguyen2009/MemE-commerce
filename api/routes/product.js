@@ -50,6 +50,7 @@ router.get("/find/:id", async(req, res) => {
 })
 
 //GET all products
+//This is also for finding products based on CATEGORY and RECENT
 router.get("/", async(req, res) => {
     const newProduct = req.query.new; // e.g. "?recent = true"            | 1st way to retrieve query
     const queryCategory = req.query.category; // e.g. ?catetogory = "crying"
@@ -59,7 +60,7 @@ router.get("/", async(req, res) => {
 
         if(newProduct) { //show by recently
             allProducts = await Product.find().sort({createdAt: -1}).limit(1);
-        } else if (queryCategory) {
+        } else if (queryCategory) { //show by category
             allProducts = await Product.find({
                 categories: {
                     $in: [queryCategory]

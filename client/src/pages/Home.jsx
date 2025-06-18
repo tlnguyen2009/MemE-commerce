@@ -14,7 +14,7 @@ const Home = () => {
       <Navbar/>
       <Slider/>
       <Categories/>
-      <Products/>
+      <Products limit = {12}/> {/* just want max 12 Products showed up on Home */}
       <Newsletter/>
       <Footer/>
     </div>

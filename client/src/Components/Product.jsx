@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { FavoriteBorderOutlined, SearchOutlined, ShoppingCartOutlined } from '@mui/icons-material'
 import { mobile } from '../responsive'
+import {Link} from "react-router-dom"
 
 const Info = styled.div`
   opacity: 0;
@@ -108,7 +109,9 @@ const Product = ({eachproduct}) => {
               <StyledShoppingCart/>
           </Icon>
           <Icon>
-              <StyledSearch/>
+              <Link to={`/product/${eachproduct._id}`}>
+                  <StyledSearch/>
+              </Link>
           </Icon>
           <Icon>
               <StyledFavoriteBorder/>

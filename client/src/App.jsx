@@ -1,3 +1,7 @@
+/*
+1/ I messed up with "products" and "product" in the path and it takes me the whole afternoon to figure out
+*/
+
 import Cart from "./pages/Cart";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -18,7 +22,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="products/:category" element={<ProductList/>} />
-        <Route path="products/:id" element={<Product/>} />
+        <Route path="product/:id" element={<Product/>} />
         <Route path="cart" element={<Cart/>} />
         {/* only show if user is not logged-in yet */}
         <Route path="login" element={user ? <Navigate to = "/"/> : <Login/>} />

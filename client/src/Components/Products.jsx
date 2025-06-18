@@ -24,7 +24,7 @@ const Container = styled.div`
     `}
 `;
 
-const Products = ({cat, sort}) => {
+const Products = ({cat, sort, limit}) => {
   const [filterProducts, setFilterProducts] = useState([]) //use to save new array created in useEffect() below based on "cat"
 
   useEffect(()=>{
@@ -47,6 +47,12 @@ const Products = ({cat, sort}) => {
         } else {
           products.sort((a,b) => a.createdAt - b.createdAt);
         }
+
+        // Apply limit
+        if (limit) {
+          products = products.slice(0, limit);
+        }
+        
         console.log(products)
         setFilterProducts(products)
       } catch (err) {};
