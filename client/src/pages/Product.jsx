@@ -16,6 +16,8 @@ import { mobile } from "../responsive"
 import { useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from 'axios'
+import { useDispatch } from "react-redux"
+import { addProduct } from "../redux/cartRedux"
 
 const Container = styled.div``
 
@@ -128,6 +130,7 @@ const Product = () => {
   const id = location.pathname.split('/')[2]; 
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const getProduct = async () => {
@@ -153,9 +156,9 @@ const Product = () => {
     }
   }
 
-  //Update cart
+  //Update cart by using Redux dispath
   const handleAddCart = () => {
-
+    dispatch(addProduct({product, quantity, total: product.price*quantity}))
   }
 
   return (

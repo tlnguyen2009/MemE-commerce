@@ -1,4 +1,5 @@
 import { Add, Remove } from "@mui/icons-material"
+import { useSelector } from "react-redux"
 import styled from "styled-components"
 import Announcement from "../Components/Announcement"
 import Footer from "../Components/Footer"
@@ -63,9 +64,55 @@ const Info = styled.div`
     padding: 30px;
 `
 
+const CartHeader = styled.div`
+    display: flex;
+    margin-bottom: 1rem;
+`
+
+const InfoHeader = styled.div`
+    flex: 2; //take 2 parts compare to "OtherHeaders" below in "CartHeader" box
+    display: flex;
+`
+
+const OthersHeader = styled.div`
+    flex: 1; //take 1 part compare to "" above in "CartHeader" box
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
+
+const ItemInfo = styled.div`
+    font-weight: 700;
+    font-size: large;
+`
+
+const PriceEach = styled.div`
+    display: flex;
+    flex: 1;
+    font-weight: 700;
+    font-size: large;
+    justify-content: center;
+`
+
+const Qty = styled.div`
+    display: flex;
+    flex: 2;
+    font-weight: 700;
+    font-size: large;
+    justify-content: center;
+`
+
+const Total = styled.div`
+    display: flex;
+    flex: 1;
+    font-weight: 700;
+    font-size: large;
+    justify-content: center;
+`
+
 const Product = styled.div`
     display: flex;
-    
+    margin-bottom: 1rem;
 `
 
 const ProductDetail = styled.div`
@@ -120,8 +167,9 @@ const PriceDetail = styled.div`
 const AmountContainer = styled.div`
     display: flex;
     align-items: center;
+    justify-content: center;
     font-weight: 770;
-    margin: 10px 0px;
+    flex: 2;
 `
 
 const Amount = styled.span`
@@ -153,18 +201,28 @@ const AdjustButton = styled.div`
 `
 
 const ProductPrice = styled.div` 
-    margin-left: 60px;
+    display: flex;
+    flex: 1;
     font-weight: 500;
+    justify-content: center;
+
     ${mobile` 
         margin: 0px;
     `}
+`
+
+const ProductTotal = styled.div`
+    display: flex;
+    flex: 1;
+    font-weight: 600;
+    justify-content: center;
 `
 
 const Hr = styled.hr` 
     background-color: #eee;
     border: none;
     height: 2px;
-    margin: 10px 0px;
+    margin: 10px 0px 10px 0px;
 
 `
 
@@ -205,6 +263,10 @@ const SummaryButton = styled.button`
 `
 
 const Cart = () => {
+  //Apply Redux
+  const cart = useSelector((state) => state.cart)
+  /* console.log(cart) */
+
   return (
     <Container>
         <Navbar/> 
@@ -215,7 +277,7 @@ const Cart = () => {
             <Top>
                 <TopButton>CONTINUE SHOPPING</TopButton>
                 <TopTexts>
-                    <Text>Shopping Bag (2)</Text>
+                    <Text>Shopping Bag ({cart.quantity})</Text>
                     <Text>Wish list (0)</Text>
                 </TopTexts>
                 <TopButton type = "filled">CHECK OUT</TopButton>
@@ -223,41 +285,41 @@ const Cart = () => {
 
             <Bottom>
                 <Info>
-                    <Product>
-                        <ProductDetail>
-                            <Image src= "/public/Assets/product_crying4.jpg"></Image>
-                            <Details>
-                                <ProductName> <b>Product: </b>cat crying and brushing teeth </ProductName>
-                                <ProductId> <b>ID: </b>20091998 </ProductId>
-                            </Details>
-                        </ProductDetail>
-                        <PriceDetail>
-                            <AmountContainer>
-                                <AdjustButton><Remove/></AdjustButton>
-                                <Amount>1</Amount>
-                                <AdjustButton><Add/></AdjustButton>
-                            </AmountContainer>
-                            <ProductPrice> $ 1.50 ea. </ProductPrice>
-                        </PriceDetail>
-                    </Product>
-                    <Hr/>
-                    <Product>
-                        <ProductDetail>
-                            <Image src= "/public/Assets/product_funny4.jpg"></Image>
-                            <Details>
-                                <ProductName> <b>Product: </b>cat with silly face </ProductName>
-                                <ProductId> <b>ID: </b>17102001 </ProductId>
-                            </Details>
-                        </ProductDetail>
-                        <PriceDetail>
-                            <AmountContainer>
-                                <AdjustButton><Remove/></AdjustButton>
-                                <Amount>1</Amount>
-                                <AdjustButton><Add/></AdjustButton>
-                            </AmountContainer>
-                            <ProductPrice> $ 2.00 ea. </ProductPrice>
-                        </PriceDetail>
-                    </Product>
+                <CartHeader>
+                    <InfoHeader>
+                        <ItemInfo>Item</ItemInfo>
+                    </InfoHeader>
+                    <OthersHeader>
+                        <PriceEach> Price </PriceEach>
+                        <Qty> Qty </Qty>
+                        <Total> Total </Total>
+                    </OthersHeader>
+                </CartHeader>
+
+                <Hr/> 
+                    {cart.products.map(eachProduct => (
+                        <div>
+                            <Product>
+                                <ProductDetail>
+                                    <Image src= {eachProduct.img}></Image>
+                                    <Details>
+                                        <ProductName> <b>Product: </b>{eachProduct.title} </ProductName>
+                                        <ProductId> <b>ID: </b>{eachProduct._id} </ProductId>
+                                    </Details>
+                                </ProductDetail>
+                                <PriceDetail>
+                                    <ProductPrice> $ {eachProduct.price.toFixed(2)} </ProductPrice>
+                                    <AmountContainer>
+                                        <AdjustButton><Remove/></AdjustButton>
+                                        <Amount>{eachProduct.thisProductQuantity}</Amount>
+                                        <AdjustButton><Add/></AdjustButton>
+                                    </AmountContainer>
+                                    <ProductTotal> $ {eachProduct.thisProductTotal.toFixed(2)} </ProductTotal>
+                                </PriceDetail>
+                            </Product>
+                            <Hr/>
+                        </div>    
+                    ))}
                 </Info>
                 
                 <Summary>

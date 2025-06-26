@@ -80,7 +80,7 @@ const ProductList = () => {
                 </Select>
             </Filter>
         </FilterContainer>
-        <Products cat={filterCat} sort = {sort}/> {/* call Products.jsx */}
+        <Products cat={filterCat} sort = {sort}/> {/* call Products.jsx component*/}
         <Newsletter/>
         <Footer/>
     </Container>
