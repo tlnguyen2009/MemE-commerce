@@ -34,7 +34,7 @@ router.post("/register", async (req, res) => {
 })
 
 //LOGIN
-router.post("/login", async (req,res)=>{
+router.post("/login", async (req,res)=>{ //we need "username" and "password" for req from client
 
     try{
         //finding username in database 
@@ -53,11 +53,9 @@ router.post("/login", async (req,res)=>{
             return res.status(401).json("Wrong username or password");
         
         //if everything match (SUCCESSFULLY LOG-IN) -> send back a token for user
-        // Load private and public keys
-        const privateKey = fs.readFileSync('./private.key', 'utf8');
-        // const publicKey = fs.readFileSync('./public.key', 'utf8'); //use for other route later
+        const privateKey = fs.readFileSync('./private.key', 'utf8');        // Load private
         
-        //grant a token (asynchronously using RSA)
+        //grant a token (asynchronously using RSA) - to save data in "payload" in ecrypted form
         jwt.sign(
             {   //payload
                 id: foundUser._id, //save _id of the tuple in MongooseDB
@@ -67,15 +65,14 @@ router.post("/login", async (req,res)=>{
             { algorithm: 'RS256', expiresIn: "1d"},
             (err,token) => { //when gain the token
                 if (err)
-                    return res.status(500).json("Signing error!");
+                    return res.status(500).json("cannot do jwt. Signing error!");
                 
                 //object destructuring => extract password and others => NOT send the password
                 const {password, ...others} = foundUser.toObject(); //"toObject()" helps filtered out unrelated info, get rid of it to see
-                res.status(200).json({"user": others, "token": token}); //then, just sending others (NOT including password) + token
+                res.status(200).json({"user": others, "token": token}); //then, just sending others (NOT including password) + token (already encrypted). 
+                //====> in short, "user" will save info for only front-end display purpose and for userRedux later (such as username, email, isAdmin - basically everything in User schema excepting for password). Whereas the "token" save "_id" and "isAdmin" for later verifying.
                 
                 // console.log("JWT token created:", token); //testing
-
-                //Question is should we save the "token" here inside localStorage???
             });
 
     } catch(err) {

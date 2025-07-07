@@ -5,7 +5,7 @@ trouble i have:
 
 import { useEffect, useState } from 'react';
 import styled from 'styled-components'
-import { popularProducts } from '../data'
+// import { popularProducts } from '../data'
 import { mobile } from '../responsive';
 import Product from './Product'
 import axios from 'axios'

@@ -1,10 +1,13 @@
 import { Add, Remove } from "@mui/icons-material"
-import { useSelector } from "react-redux"
 import styled from "styled-components"
 import Announcement from "../Components/Announcement"
 import Footer from "../Components/Footer"
 import Navbar from "../Components/Navbar"
 import { mobile } from "../responsive"
+
+import { useDispatch, useSelector } from "react-redux"
+import {updateQuantity} from "../redux/cartRedux"
+import axios from "axios"
 
 const Container= styled.div` `
 const Wrapper = styled.div` 
@@ -35,6 +38,11 @@ const TopButton = styled.button`
     border: ${(props)=>props.type === "filled" && "none"};
     background-color: ${props=>props.type === "filled" ? "black" : "transparent"};
     color: ${props=>props.type === "filled" && "white"};
+
+    transition: transform 0.1s ease;
+    &:active {
+        transform: scale(0.98);
+    }    
 `
 
 const TopTexts = styled.div`
@@ -260,12 +268,32 @@ const SummaryButton = styled.button`
     background-color: black;
     color: white;
     font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    &:active {
+        transform: scale(0.98);
+    }
 `
 
 const Cart = () => {
   //Apply Redux
   const cart = useSelector((state) => state.cart)
   /* console.log(cart) */
+  const dispatch = useDispatch();
+
+  const handleCheckout = async () => {
+    try {
+        const res = await axios.post(
+            `http://localhost:5000/api/stripes/create-checkout-session`, 
+            { products: cart.products, }
+        );
+        
+        window.location.href = res.data.url; // Stripe will handle the payment page
+    } catch (err) {
+        console.log(err);
+    }
+
+  };
 
   return (
     <Container>
@@ -297,51 +325,51 @@ const Cart = () => {
                 </CartHeader>
 
                 <Hr/> 
-                    {cart.products.map(eachProduct => (
-                        <div>
-                            <Product>
-                                <ProductDetail>
-                                    <Image src= {eachProduct.img}></Image>
-                                    <Details>
-                                        <ProductName> <b>Product: </b>{eachProduct.title} </ProductName>
-                                        <ProductId> <b>ID: </b>{eachProduct._id} </ProductId>
-                                    </Details>
-                                </ProductDetail>
-                                <PriceDetail>
-                                    <ProductPrice> $ {eachProduct.price.toFixed(2)} </ProductPrice>
-                                    <AmountContainer>
-                                        <AdjustButton><Remove/></AdjustButton>
-                                        <Amount>{eachProduct.thisProductQuantity}</Amount>
-                                        <AdjustButton><Add/></AdjustButton>
-                                    </AmountContainer>
-                                    <ProductTotal> $ {eachProduct.thisProductTotal.toFixed(2)} </ProductTotal>
-                                </PriceDetail>
-                            </Product>
-                            <Hr/>
-                        </div>    
-                    ))}
+                {cart.products.map(eachProduct => (
+                    <div key={eachProduct._id}>
+                        <Product>
+                            <ProductDetail>
+                                <Image src= {eachProduct.img}></Image>
+                                <Details>
+                                    <ProductName> <b>Product: </b>{eachProduct.title} </ProductName>
+                                    <ProductId> <b>ID: </b>{eachProduct._id} </ProductId>
+                                </Details>
+                            </ProductDetail>
+                            <PriceDetail>
+                                <ProductPrice> $ {eachProduct.price.toFixed(2)} </ProductPrice>
+                                <AmountContainer>
+                                    <AdjustButton onClick={() => dispatch(updateQuantity({ _id: eachProduct._id, type: 'dec' }))}><Remove/></AdjustButton>
+                                    <Amount>{eachProduct.thisProductQuantity}</Amount>
+                                    <AdjustButton onClick={() => dispatch(updateQuantity({ _id: eachProduct._id, type: 'inc' }))}><Add/></AdjustButton>
+                                </AmountContainer>
+                                <ProductTotal> $ {eachProduct.thisProductTotal.toFixed(2)} </ProductTotal>
+                            </PriceDetail>
+                        </Product>
+                        <Hr/>
+                    </div>    
+                ))}
                 </Info>
                 
                 <Summary>
                     <SummaryTitle>Order Summary</SummaryTitle>
                     <SummaryItem>
                         <SummaryItemText>Subtotal: </SummaryItemText>
-                        <SummaryItemPrice>$ 3.50</SummaryItemPrice>
+                        <SummaryItemPrice> {cart.subtotal}</SummaryItemPrice>
                     </SummaryItem>
                     <SummaryItem>
                         <SummaryItemText>Tax: </SummaryItemText>
-                        <SummaryItemPrice>$ 0.35</SummaryItemPrice>
+                        <SummaryItemPrice>{(cart.subtotal * 0.0625).toFixed(2)}</SummaryItemPrice>
                     </SummaryItem>
                     <SummaryItem>
                         <SummaryItemText>Discount: </SummaryItemText>
-                        <SummaryItemPrice>$ - 0.35</SummaryItemPrice>
+                        <SummaryItemPrice></SummaryItemPrice>
                     </SummaryItem>
                     <Hr/>
                     <SummaryItem $istotal = "total">
-                        <SummaryItemText>Total: </SummaryItemText>
-                        <SummaryItemPrice>$ 3.50</SummaryItemPrice>
+                        <SummaryItemText>Grand Total: </SummaryItemText>
+                        <SummaryItemPrice>{(cart.subtotal * 0.0625 + cart.subtotal).toFixed(2)}</SummaryItemPrice>
                     </SummaryItem>
-                    <SummaryButton>CHECK OUT NOW!</SummaryButton>
+                    <SummaryButton onClick={handleCheckout}>CHECK OUT NOW!</SummaryButton>
                 </Summary>
             </Bottom>
         </Wrapper>

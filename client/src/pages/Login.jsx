@@ -1,5 +1,8 @@
 import styled from "styled-components"
 import { mobile } from "../responsive"
+import { useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { login } from "../redux/loginAPICall"
 
 const Container = styled.div` 
     width: 100vw;
@@ -59,6 +62,12 @@ const Button = styled.button`
     &:active { // animation when clicking 
         transform: scale(0.96);
     }
+
+    &:disabled {
+        color: white;
+        cursor: not-allowed;
+        background-color: gray;
+    }
 `
 
 const Link = styled.a`
@@ -72,17 +81,39 @@ const CreateAccount = styled.div`
     color: gray;
     font-style: italic;
 `
+
+const Error = styled.div` 
+    color: red;
+`
+
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch()
+  const {isFetching, error} = useSelector((state) => state.user)
+  
+  const handleLogin = (e) => {
+    e.preventDefault(); //stop the page from reloading after submitting the "form"
+    login(dispatch, {username, password}) //call from loginAPICall.js
+  }
+
   return (
     <Container>
         <Wrapper>
             <Title>SIGN IN</Title>
             <CreateAccount> Don't have an account? <Link>Sign up</Link></CreateAccount>
-            <Form>
-                <Input placeholder = "Username"/>
-                <Input placeholder = "Password"/>
-                
-                <Button type = "submit">Login</Button>
+            <Form onSubmit={handleLogin}> {/* onSubmit={...} with click on "Login" button or with "Enter key" */}
+                <Input 
+                    placeholder = "Username"
+                    onChange={(e) => setUsername(e.target.value)}    
+                />
+                <Input 
+                    placeholder = "Password"
+                    type= "password"
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button type="submit" disabled={isFetching}>Login</Button> 
+                {error && <Error>Something wrong...</Error>} {/* if error? => warning */}             
                 <Link>Forget password?</Link>    
             </Form>
         </Wrapper>
